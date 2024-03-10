@@ -81,8 +81,10 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
 
   const playCard = (card: CardDataType, forHouse = false) => {
-    const cardValue = getValueOfCard(card);
-    addPoints(cardValue, forHouse);
+    if(gameStatus === GameStatus.DRAWING_PHASE || gameStatus === GameStatus.GAME_IN_MOTION){
+      const cardValue = getValueOfCard(card);
+      addPoints(cardValue, forHouse);
+    }
   };
 
   const getValueOfCard = (card: CardDataType) => {
@@ -116,6 +118,7 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
 
   const resetGame = () => {
+    setUserWon(false)
     setUserPoints(0)
     setHousePoints(0)
     setGameStatus(GameStatus.IDLE)

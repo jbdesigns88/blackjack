@@ -34,8 +34,6 @@ const BlackJack = () => {
   const [userCards, setUserCards] = useState<CardDataType[]>([]);
 
 
-
-
   useEffect(() => {
     if(gameStatus === GameStatus.DRAWING_PHASE){
         pickCard(4)
@@ -48,6 +46,7 @@ const BlackJack = () => {
 
   useEffect(() => {
 
+    
     if( drawnCards && drawnCards.length > 0){
         const cardToDistribute = drawnCards[drawnCards.length - 1];
 
@@ -56,9 +55,11 @@ const BlackJack = () => {
             playCard(cardToDistribute, true)
         }
         else{
+          if(gameStatus === GameStatus.DRAWING_PHASE || gameStatus === GameStatus.GAME_IN_MOTION){
             setUserCards(prevUserCards => [...prevUserCards, cardToDistribute]);
             playCard(cardToDistribute)
             setCurrentCard(cardToDistribute)
+          }
         }
 
         setDrawnCards(drawnCards.slice(0,-1))
@@ -66,7 +67,7 @@ const BlackJack = () => {
 
 
 
-  },[drawnCards,playCard,houseCards.length])
+  },[drawnCards,playCard,houseCards.length,gameStatus])
 
 
 
@@ -99,17 +100,24 @@ const BlackJack = () => {
     startGame(drawingPhase);
   };
 
-  const handlePlayAgain = () => {
-    resetGame()
-    setDrawnCards(null)
-    setCurrentCard(null)
-    setHouseCards([])
-    setUserCards([])
+  const handlePlayAgain = async () => {
+    // Reset game context states
+    resetGame();
+  
+    // Await new deck to ensure it's loaded before resetting local component states
+    await getNewDeck(); // Assuming getNewDeck is async and properly updates context
+  
+    // Reset local states
+    setHouseCards([]);
+    setUserCards([]);
+    setDrawnCards(null);
+    setCurrentCard(null);
 
-    getNewDeck()
-
+  
+    // Optional: force re-render if necessary (not recommended as a primary solution)
+    // setKey(prevKey => prevKey + 1); // Add a key state and use it on a component
   };
-
+  
   return (
     <>
     <Box> 
