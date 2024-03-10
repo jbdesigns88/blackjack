@@ -1,4 +1,4 @@
-import React, { useState,ReactNode, useEffect } from "react"
+import React, { useState,ReactNode, useEffect,useCallback } from "react"
 import { CardContext } from "../contexts/CardContext";
 import { CardDataType } from "../types/DataTypes";
 import axios from 'axios';
@@ -18,7 +18,6 @@ interface CardResponseType {
   
 const CardProvider: React.FC<CardProviderType> = ({children}) => {
     const [selectedCards,setSetSelectedCards] = useState<CardDataType[] | null>(null)
-    const [remainingCards,setRemainingCards] = useState<number | null>(null)
     const [deck,setDeck] = useState<CardDataType[]>([])
     const [deckId,setDeckId] = useState<string | null>(null)
     
@@ -28,7 +27,6 @@ const CardProvider: React.FC<CardProviderType> = ({children}) => {
         const newDeckResponse = await axios.get('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1');
         const newDeckId = newDeckResponse.data.deck_id;
         setDeckId(newDeckId);
-        setRemainingCards(newDeckResponse.data.remaining)
       } catch (error) {
         console.error("Error fetching new deck:", error);
       }
@@ -43,40 +41,41 @@ const CardProvider: React.FC<CardProviderType> = ({children}) => {
         fetchAndShuffleDeck()
     }
 
-    const pickCard = (howMany = 1) => {
-        const DrawACard = async () => {
-            try {
-                if(deckId){
-                    const response = await axios.get(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=${howMany}`);
-            
-                    const drawnCards = response.data.cards;
-                    const processedCards:CardDataType[]  = drawnCards.map((drawnCard:CardResponseType) => {
-                        return {
-                               value: drawnCard.value,
-                                suit: drawnCard.suit,
-                                png: drawnCard.images.png
-                            }
-                        
-                    })
-
-                    setSetSelectedCards(processedCards)
-                    setRemainingCards(response.data.remaining)
-                }
-                else{
-                    throw new Error("issue retrieving card")
-                }
-      
-
-            } catch (error) {
-              console.error("Error fetching new deck:", error);
-            }
-
-            return null
-          };
-
-          return DrawACard()
+    const pickCard = useCallback((howMany = 1) => {
+      const DrawACard = async () => {
+          try {
+              if(deckId){
+                  const response = await axios.get(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=${howMany}`);
           
-    }
+                  const drawnCards = response.data.cards;
+                  const processedCards:CardDataType[]  = drawnCards.map((drawnCard:CardResponseType) => {
+                      return {
+                             value: drawnCard.value,
+                              suit: drawnCard.suit,
+                              png: drawnCard.images.png
+                          }
+                      
+                  })
+
+                  setSetSelectedCards(processedCards)
+     
+              }
+              else{
+                  throw new Error("issue retrieving card")
+              }
+    
+
+          } catch (error) {
+            console.error("Error fetching new deck:", error);
+          }
+
+          return null
+        };
+
+        return DrawACard()
+        
+  },[deckId])
+
 
     const shuffleDeck = () => {
         let shuffledDeck = [...deck]; 

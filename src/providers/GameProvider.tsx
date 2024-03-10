@@ -1,4 +1,4 @@
-import React, { ReactNode,  useState } from "react";
+import React, { ReactNode,  useEffect,  useState } from "react";
 import { GameContext } from "../contexts/GameContext";
 import { CardDataType } from "../types/DataTypes";
 import { FaceCards, GameStatus } from "../types/constants";
@@ -14,9 +14,6 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [housePoints, setHousePoints] = useState(0);
   const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.IDLE);
   const [userWon, setUserWon] = useState(false);
-
-
-
   const winningTarget = 21;
 
   const userHitTheTargetPoint = () => {
@@ -31,33 +28,37 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     return  userPoints > winningTarget
   }
 
-  const userTiedWithHouse = () => {
-   return  userPoints === housePoints
-  }
-  const userHasLessPointsThanHouseAndLessThanTarget =() => {
-    return (!userHasMorePointsThanHouse()) && (!userTiedWithHouse()) && (!userPointsPassedTargetPoint())
-  }
+
 
   const winningRequirements = ()=>{
-    return userHitTheTargetPoint() ||  userHasMorePointsThanHouse()
+    return (userHitTheTargetPoint() ||  userHasMorePointsThanHouse()) && !userPointsPassedTargetPoint()
   }
 
-  const losingRequirements = () => {
-    return  (userTiedWithHouse()) || (userPointsPassedTargetPoint()) || (userHasLessPointsThanHouseAndLessThanTarget())
-  }
+
+  useEffect(() => {
+
+    if (gameStatus === GameStatus.GAME_IN_MOTION) {
+      if (userPoints > winningTarget) {
+        setUserWon(false);
+        setGameStatus(GameStatus.GAME_OVER);
+      } else if (userPoints === winningTarget) {
+        setUserWon(true);
+        setGameStatus(GameStatus.GAME_OVER);
+      }
+    }
+  }, [gameStatus, userPoints, winningTarget]); 
+  
+
+
+
+
+
   const checkIfUserWon = () => {
     
       if (winningRequirements()) {
         setUserWon(true);
         setGameStatus(GameStatus.GAME_OVER);
       }
-
-      if (losingRequirements()) {
-        setUserWon(false);
-        setGameStatus(GameStatus.GAME_OVER);
-      }
-
-  
   };
 
 
@@ -131,7 +132,6 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         handleStand,
         startGame,
         resetGame,
-        checkIfUserWon
       }}
     >
       {children}

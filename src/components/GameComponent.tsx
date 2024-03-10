@@ -23,7 +23,6 @@ const BlackJack = () => {
     handleStand,
     startGame,
     resetGame,
-    checkIfUserWon
   } = useGameContext();
   const { getNewDeck, pickCard, selectedCards } = useCardContext();
   const {player} = usePlayerContext()
@@ -52,11 +51,14 @@ const BlackJack = () => {
     if( drawnCards && drawnCards.length > 0){
         const cardToDistribute = drawnCards[drawnCards.length - 1];
 
-        if(drawnCards.length % 2 === 0){
+        if(drawnCards.length % 2 === 0 && houseCards.length < 2){
             setHouseCards(prevHouseCards => [...prevHouseCards, cardToDistribute]);
+            playCard(cardToDistribute, true)
         }
         else{
             setUserCards(prevUserCards => [...prevUserCards, cardToDistribute]);
+            playCard(cardToDistribute)
+            setCurrentCard(cardToDistribute)
         }
 
         setDrawnCards(drawnCards.slice(0,-1))
@@ -64,29 +66,13 @@ const BlackJack = () => {
 
 
 
-  },[drawnCards])
-
-  useEffect(() => {
-    userCards.forEach((userCard) => {
-        playCard(userCard)
-        if(gameStatus === GameStatus.GAME_IN_MOTION){
-            setCurrentCard(userCard)
-        }
-    })
-  },[userCards,gameStatus,playCard])
-
-  useEffect(() => {
-    houseCards.forEach((houseCard) => {
-        playCard(houseCard, true)
-    })
-  },[houseCards,playCard])
+  },[drawnCards,playCard,houseCards.length])
 
 
-  useEffect(() => {
-    if(userCards.length > 2){
-      checkIfUserWon()
-    }
-  },[userPoints,checkIfUserWon,userCards])
+
+
+
+ 
 
   useEffect(() => {
     if(gameStatus === GameStatus.DRAWING_PHASE && drawnCards?.length === 0){
@@ -114,11 +100,12 @@ const BlackJack = () => {
   };
 
   const handlePlayAgain = () => {
+    resetGame()
     setDrawnCards(null)
     setCurrentCard(null)
     setHouseCards([])
     setUserCards([])
-    resetGame()
+
     getNewDeck()
 
   };

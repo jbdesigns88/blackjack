@@ -8,7 +8,6 @@ interface GameContextType {
     handleStand: () => void;
     startGame: (start?:boolean) => void;
     resetGame: () => void;
-    checkIfUserWon: () => void;
     userPoints:number;
     housePoints:number
     userWon:boolean;
