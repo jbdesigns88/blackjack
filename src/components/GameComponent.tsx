@@ -147,8 +147,8 @@ const BlackJack = () => {
         )}
       </Grid>
 
-      <Grid  item xs={12}>
-            <Grid container xs={12} spacing={3}>
+      <Grid  item xs={12} sx={{width:"100%" , maxWidth:"640px"}}  alignItems="center" justifyContent="center">
+            <Grid container xs={12} spacing={3} >
                 <Grid item xs={6}>
                     <Typography sx={styles.score}>House Points: {housePoints}</Typography>
                   
