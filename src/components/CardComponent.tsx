@@ -1,13 +1,8 @@
 // CardComponent.jsx
-import React, { useEffect, useState  }  from 'react';
+import React from 'react';
 import { CardDataType } from '../types/DataTypes';
 import { Box } from '@mui/material';
-const suitSymbols: { [key: string]: string } = {
-    'Clubs': '♣',
-    'Diamonds': '♦',
-    'Hearts': '♥',
-    'Spades': '♠'
-};
+
 
 const CardComponent = ({ card,mainDisplay=false }: {card:CardDataType,mainDisplay?:boolean}) => {
     return card && (

@@ -34,21 +34,18 @@ const BlackJack = () => {
   const [houseCards, setHouseCards] = useState<CardDataType[]>([]);
   const [userCards, setUserCards] = useState<CardDataType[]>([]);
 
-  const [message, setMessage] = useState("");
+
 
 
   useEffect(() => {
     if(gameStatus === GameStatus.DRAWING_PHASE){
         pickCard(4)
     }
-    if (gameStatus === GameStatus.GAME_OVER) {
-      setMessage(userWon ? "You Won!" : " You Lost!");
-    }
-  }, [gameStatus]);
+  }, [gameStatus,pickCard]);
 
   useEffect(() => {
     if(selectedCards){setDrawnCards(selectedCards)}
-  },[selectedCards])
+  },[selectedCards,pickCard])
 
   useEffect(() => {
 
@@ -76,20 +73,20 @@ const BlackJack = () => {
             setCurrentCard(userCard)
         }
     })
-  },[userCards])
+  },[userCards,gameStatus,playCard])
 
   useEffect(() => {
     houseCards.forEach((houseCard) => {
         playCard(houseCard, true)
     })
-  },[houseCards])
+  },[houseCards,playCard])
 
 
   useEffect(() => {
     if(userCards.length > 2){
       checkIfUserWon()
     }
-  },[userPoints])
+  },[userPoints,checkIfUserWon,userCards])
 
   useEffect(() => {
     if(gameStatus === GameStatus.DRAWING_PHASE && drawnCards?.length === 0){
@@ -99,7 +96,7 @@ const BlackJack = () => {
 
     }
    
-  },[userPoints,housePoints,drawnCards])
+  },[userPoints,housePoints,drawnCards,gameStatus,houseCards,startGame,userCards])
 
 
 

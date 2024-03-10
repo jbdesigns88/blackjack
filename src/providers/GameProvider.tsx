@@ -1,8 +1,8 @@
-import React, { ReactNode, useEffect, useState,useRef } from "react";
+import React, { ReactNode,  useState } from "react";
 import { GameContext } from "../contexts/GameContext";
 import { CardDataType } from "../types/DataTypes";
 import { FaceCards, GameStatus } from "../types/constants";
-import Game from "../components/GameComponent";
+
 interface GameProviderProps {
   children: ReactNode;
 }
@@ -19,20 +19,40 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const winningTarget = 21;
 
+  const userHitTheTargetPoint = () => {
+    return userPoints === winningTarget
+  }
+
+  const userHasMorePointsThanHouse = () =>  {
+    return userPoints > housePoints
+  }
+
+  const userPointsPassedTargetPoint = () => {
+    return  userPoints > winningTarget
+  }
+
+  const userTiedWithHouse = () => {
+   return  userPoints === housePoints
+  }
+  const userHasLessPointsThanHouseAndLessThanTarget =() => {
+    return (!userHasMorePointsThanHouse()) && (!userTiedWithHouse()) && (!userPointsPassedTargetPoint())
+  }
+
+  const winningRequirements = ()=>{
+    return userHitTheTargetPoint() ||  userHasMorePointsThanHouse()
+  }
+
+  const losingRequirements = () => {
+    return  (userTiedWithHouse()) || (userPointsPassedTargetPoint()) || (userHasLessPointsThanHouseAndLessThanTarget())
+  }
   const checkIfUserWon = () => {
-
-
     
-      if (userPoints === winningTarget || userPoints > housePoints) {
+      if (winningRequirements()) {
         setUserWon(true);
         setGameStatus(GameStatus.GAME_OVER);
       }
 
-      if (
-        userPoints === housePoints ||
-        userPoints > winningTarget ||
-        (userPoints < winningTarget && userPoints < housePoints)
-      ) {
+      if (losingRequirements()) {
         setUserWon(false);
         setGameStatus(GameStatus.GAME_OVER);
       }
