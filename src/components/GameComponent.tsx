@@ -23,7 +23,7 @@ const BlackJack = () => {
     handleStand,
     startGame,
     resetGame,
-    updateAllowChecks
+    checkIfUserWon
   } = useGameContext();
   const { getNewDeck, pickCard, selectedCards } = useCardContext();
   const {player} = usePlayerContext()
@@ -87,7 +87,7 @@ const BlackJack = () => {
 
   useEffect(() => {
     if(userCards.length > 2){
-        updateAllowChecks()
+      checkIfUserWon()
     }
   },[userPoints])
 
@@ -107,10 +107,9 @@ const BlackJack = () => {
 
     if ( gameStatus === GameStatus.GAME_IN_MOTION ) {
         pickCard()
-        
+
     }
 
-    console.log(`${JSON.stringify(selectedCards)}`)
   };
 
   const handleStart = (drawingPhase = false) => {
@@ -132,7 +131,7 @@ const BlackJack = () => {
     <Box> 
    <Grid container spacing={2} direction="column" alignItems="center" justifyContent="center" sx={{ minHeight: '100vh' , pb:{ xs:'200px',sm:'0'} }}>
       {gameStatus === GameStatus.GAME_OVER && <Typography variant="h4" sx={{ mb: 2, color: 'white' }}>{userWon ? "You Won!" : "You Lost!"}</Typography>}
-      <Grid item spacing={2} justifyContent="center">
+      <Grid item  justifyContent="center">
         {gameStatus === GameStatus.IDLE && (
           <Button sx={styles.startButton} onClick={() => handleStart(true)}>Start Game</Button>
         )}
@@ -148,7 +147,7 @@ const BlackJack = () => {
       </Grid>
 
       <Grid  item xs={12} sx={{width:"100%" , maxWidth:"640px"}}  alignItems="center" justifyContent="center">
-            <Grid container xs={12} spacing={3} >
+            <Grid container spacing={3} >
                 <Grid item xs={6}>
                     <Typography sx={styles.score}>House Points: {housePoints}</Typography>
                   
@@ -173,12 +172,12 @@ const BlackJack = () => {
 
     </Grid>
  
-         <Grid sx={styles.gameCardsContainer} xs={12} container>
-                <Grid xs={12} sm={6} item>
+         <Grid container sx={styles.gameCardsContainer} >
+                <Grid item xs={12} sm={6} >
                     <CardGrid cards={houseCards} title="House Cards" />
                   
                 </Grid>
-                <Grid xs={12} sm={6} item>
+                <Grid item xs={12} sm={6} >
                     <CardGrid cards={userCards} title={`${player?.username} Cards`} />
                 </Grid>
             </Grid>

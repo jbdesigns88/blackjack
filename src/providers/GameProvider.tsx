@@ -14,43 +14,32 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [housePoints, setHousePoints] = useState(0);
   const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.IDLE);
   const [userWon, setUserWon] = useState(false);
-  const [allowChecks,setAllowCheck] = useState(false)
-  const intialLoad = useRef(true)
+
+
 
   const winningTarget = 21;
 
   const checkIfUserWon = () => {
-    if (userPoints === winningTarget || userPoints > housePoints) {
-      setUserWon(true);
-      console.log(`${userPoints} vs ${housePoints}`)
-      setGameStatus(GameStatus.GAME_OVER);
-    }
 
-    if (
-      userPoints === housePoints ||
-      userPoints > winningTarget ||
-      (userPoints < winningTarget && userPoints < housePoints)
-    ) {
-      setUserWon(false);
-      setGameStatus(GameStatus.GAME_OVER);
-    }
+
+    
+      if (userPoints === winningTarget || userPoints > housePoints) {
+        setUserWon(true);
+        setGameStatus(GameStatus.GAME_OVER);
+      }
+
+      if (
+        userPoints === housePoints ||
+        userPoints > winningTarget ||
+        (userPoints < winningTarget && userPoints < housePoints)
+      ) {
+        setUserWon(false);
+        setGameStatus(GameStatus.GAME_OVER);
+      }
+
+  
   };
 
-  useEffect(() => {
-        
-        if (gameStatus === GameStatus.GAME_IN_MOTION && allowChecks) {
-            checkIfUserWon();
-        }
-  
-
-  }, [userPoints,gameStatus]);
-
-  useEffect(() => {
-    if(allowChecks){
-        console.log("checking if you win")
-        checkIfUserWon();
-    }
-  },[allowChecks])
 
 
   const startGame = (drawingPhase = false) => {
@@ -66,9 +55,8 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
 
   const handleStand = () => {
-    checkIfUserWon()
     setGameStatus(GameStatus.GAME_OVER);
-  
+    checkIfUserWon()
   };
 
   const playCard = (card: CardDataType, forHouse = false) => {
@@ -92,9 +80,6 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const calculateAceCard = (currentPoints: number) => {
     return currentPoints <= 10 ? 11 : 1;
   };
-  const updateAllowChecks = () => {
-    setAllowCheck(true)
-  }
 
   const addPoints = (points: number, forHouse = false) => {
     if(gameStatus !== GameStatus.GAME_OVER && userPoints <= winningTarget && housePoints  <= winningTarget ){
@@ -112,7 +97,7 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const resetGame = () => {
     setUserPoints(0)
     setHousePoints(0)
-    setGameStatus(GameStatus.DRAWING_PHASE)
+    setGameStatus(GameStatus.IDLE)
   };
 
   return (
@@ -126,7 +111,7 @@ const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         handleStand,
         startGame,
         resetGame,
-        updateAllowChecks
+        checkIfUserWon
       }}
     >
       {children}
