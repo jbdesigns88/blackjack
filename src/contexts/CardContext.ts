@@ -7,6 +7,7 @@ interface CardContextType {
     selectedCards:CardDataType[] | null;
     pickCard:(howMany?:number)=>void
     shuffleDeck:()=>void
+    getNewDeck: () => void
   }
 
 export const CardContext = createContext<CardContextType | null>(null)

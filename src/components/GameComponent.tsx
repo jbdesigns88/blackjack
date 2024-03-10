@@ -11,9 +11,7 @@ import { Grid, Typography, Button, Box } from "@mui/material";
 import PlayerProvider from "../providers/PlayerProvider";
 import { usePlayerContext } from "../contexts/PlayerContext";
 import Player from "./PlayerComponent";
-interface CancellablePromise extends Promise<void> {
-    cancel: () => void;
-  }
+
   
 const BlackJack = () => {
   const {
@@ -27,7 +25,7 @@ const BlackJack = () => {
     resetGame,
     updateAllowChecks
   } = useGameContext();
-  const { shuffleDeck, pickCard, selectedCards } = useCardContext();
+  const { getNewDeck, pickCard, selectedCards } = useCardContext();
   const {player} = usePlayerContext()
 
   const [drawnCards,setDrawnCards] = useState<CardDataType[] | null>(null);
@@ -103,29 +101,6 @@ const BlackJack = () => {
    
   },[userPoints,housePoints,drawnCards])
 
-//   useEffect(() => {
-
-//     const userDrawingSequence = async () => {
-//      await drawCardsWithDelay(1000, false);
-
-// await drawCardsWithDelay(2000, false);
-
-//     await delay(2000);
-
-//       if (!defaultInitialMoves)
-//         startGame();
-//     };
-//     let isActive = true;
-//     if (!defaultInitialMoves) {
-//       setMessage("Drawing for the user...");
-//       if (isActive) userDrawingSequence();
-//     }
-
-//     return () => {
-
-//     };
-//   }, [defaultInitialMoves]);
-
 
 
   const handleHit = () => {
@@ -139,24 +114,21 @@ const BlackJack = () => {
   };
 
   const handleStart = (drawingPhase = false) => {
-    if (drawingPhase) {
-      shuffleDeck();
-    }
-
     startGame(drawingPhase);
   };
 
   const handlePlayAgain = () => {
-    shuffleDeck();
+    setDrawnCards(null)
+    setCurrentCard(null)
     setHouseCards([])
     setUserCards([])
     resetGame()
+    getNewDeck()
 
   };
 
   return (
     <>
-    <Player/>
     <Box> 
    <Grid container spacing={2} direction="column" alignItems="center" justifyContent="center" sx={{ minHeight: '100vh' , pb:{ xs:'200px',sm:'0'} }}>
       {gameStatus === GameStatus.GAME_OVER && <Typography variant="h4" sx={{ mb: 2, color: 'white' }}>{userWon ? "You Won!" : "You Lost!"}</Typography>}
@@ -217,13 +189,19 @@ const BlackJack = () => {
   );
 };
 
+
+const ShowLoginOrGame = () => {
+  const {player} = usePlayerContext()
+
+  return player == null ? <Player/> : <BlackJack/>
+}
 const Game = () => {
   return (
     <>
     <PlayerProvider>
       <GameProvider>
         <CardProvider>
-          <BlackJack />
+          <ShowLoginOrGame/>
         </CardProvider>
       </GameProvider>
       </PlayerProvider>
@@ -253,14 +231,14 @@ const styles = {
     padding: "10px 20px",
   },
   startButton: {
-    backgroundColor: "#FFD700", // Gold
-    color: "#173517", // Dark green text for contrast
+    backgroundColor: "#FFD700", 
+    color: "#173517", 
     "&:hover": {
       backgroundColor: "#E6C200",
     },
   },
   hitButton:{
-    backgroundColor: "#C0C0C0", // Silver
+    backgroundColor: "#C0C0C0",
     margin:"0 5px",
     color: "#173517",
     "&:hover": {
@@ -268,15 +246,15 @@ const styles = {
     },
   },
   standButton: {
-    backgroundColor: "#C0C0C0", // Silver
+    backgroundColor: "#C0C0C0", 
     color: "#173517",
     "&:hover": {
       backgroundColor: "#A8A8A8",
     },
   },
   playAgainButton: {
-    backgroundColor: "#FFD700", // Gold
-    color: "#173517", // Dark green text for contrast
+    backgroundColor: "#FFD700",
+    color: "#173517",
     "&:hover": {
       backgroundColor: "#E6C200",
     },

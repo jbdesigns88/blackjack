@@ -22,25 +22,26 @@ const CardProvider: React.FC<CardProviderType> = ({children}) => {
     const [deck,setDeck] = useState<CardDataType[]>([])
     const [deckId,setDeckId] = useState<string | null>(null)
     
+    const fetchAndShuffleDeck = async () => {
+      try {
+        // Fetch a new deck
+        const newDeckResponse = await axios.get('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1');
+        const newDeckId = newDeckResponse.data.deck_id;
+        setDeckId(newDeckId);
+        setRemainingCards(newDeckResponse.data.remaining)
+      } catch (error) {
+        console.error("Error fetching new deck:", error);
+      }
+    };
 
     useEffect(() => {
-        const url = 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1'
-        const fetchAndShuffleDeck = async () => {
-            try {
-              // Fetch a new deck
-              const newDeckResponse = await axios.get('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1');
-              const newDeckId = newDeckResponse.data.deck_id;
-              setDeckId(newDeckId);
-              setRemainingCards(newDeckResponse.data.remaining)
-            } catch (error) {
-              console.error("Error fetching new deck:", error);
-            }
-          };
-      
-          fetchAndShuffleDeck();
-
+      fetchAndShuffleDeck();
     },[])
 
+
+    const getNewDeck = () => {
+        fetchAndShuffleDeck()
+    }
 
     const pickCard = (howMany = 1) => {
         const DrawACard = async () => {
@@ -64,7 +65,7 @@ const CardProvider: React.FC<CardProviderType> = ({children}) => {
                 else{
                     throw new Error("issue retrieving card")
                 }
-              // Fetch a new deck
+      
 
             } catch (error) {
               console.error("Error fetching new deck:", error);
@@ -78,7 +79,7 @@ const CardProvider: React.FC<CardProviderType> = ({children}) => {
     }
 
     const shuffleDeck = () => {
-        let shuffledDeck = [...deck]; // Make a copy of the deck to shuffle
+        let shuffledDeck = [...deck]; 
         let currentIndex = shuffledDeck.length, randomIndex;
 
         while (currentIndex !== 0) {
@@ -87,10 +88,10 @@ const CardProvider: React.FC<CardProviderType> = ({children}) => {
             [shuffledDeck[currentIndex], shuffledDeck[randomIndex]] = [shuffledDeck[randomIndex], shuffledDeck[currentIndex]];
         }
 
-        setDeck(shuffledDeck); // Update the state with the shuffled deck
+        setDeck(shuffledDeck); 
     };
     return(
-    <CardContext.Provider value={{selectedCards,pickCard,shuffleDeck}}>
+    <CardContext.Provider value={{selectedCards,pickCard,shuffleDeck,getNewDeck}}>
         {children}
     </CardContext.Provider>
     )
