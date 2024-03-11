@@ -1,7 +1,7 @@
 import { useContext,createContext } from "react";
 
-import { CardDataType, PlayerDataType } from "../types/DataTypes";
-import { GameStatus } from "../types/constants";
+import { PlayerDataType } from "../types/DataTypes";
+
 
 interface PlayerContextType {
         player:PlayerDataType | null
